@@ -2,13 +2,14 @@ name: Aggiornamento Quotidiano Orvia
 
 on:
   schedule:
-    # Si avvia tutti i giorni alle 03:00 di notte (ora UTC)
     - cron: '0 3 * * *'
   workflow_dispatch:
-    # Questo permette di avviare lo script manualmente con un bottone per fare i test
 
 permissions:
   contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   genera_e_pubblica:
