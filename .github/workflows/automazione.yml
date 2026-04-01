@@ -1,0 +1,40 @@
+name: Aggiornamento Quotidiano Orvia
+
+on:
+  schedule:
+    # Si avvia tutti i giorni alle 03:00 di notte (ora UTC)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # Questo permette di avviare lo script manualmente con un bottone per fare i test
+
+permissions:
+  contents: write
+
+jobs:
+  genera_e_pubblica:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v4
+
+      - name: Setup di Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Installazione libreria Gemini
+        run: pip install -q -U google-generativeai
+
+      - name: Esecuzione script Python
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python generatore.py
+
+      - name: Salvataggio e pubblicazione su GitHub Pages
+        run: |
+          git config --global user.name "Orvia Bot"
+          git config --global user.email "bot@orvia.it"
+          git add index.html
+          git commit -m "Aggiornamento automatico articolo quotidiano" || echo "Nessuna modifica da salvare"
+          git push
