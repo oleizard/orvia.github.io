@@ -1,18 +1,15 @@
 import os
-import google.generativeai as genai
-from datetime import datetime
+from google import genai
 
 # 1. Recupero la chiave segreta dalle impostazioni di GitHub
 api_key = os.environ.get("GEMINI_API_KEY")
 if not api_key:
-    raise ValueError("API Key non trovata. Controlla i GitHub Secrets.")
+    raise ValueError("API Key non trovata. Assicurati di averla salvata nei REPOSITORY SECRETS come 'GEMINI_API_KEY'.")
 
-genai.configure(api_key=api_key)
+# 2. Inizializzo il nuovo client ufficiale Google GenAI
+client = genai.Client(api_key=api_key)
 
-# 2. Configuro il modello gratuito e veloce (Gemini 2.5 Flash)
-model = genai.GenerativeModel('gemini-2.5-flash')
-
-# 3. Il Prompt: le istruzioni per l'IA (Puoi personalizzarlo in futuro)
+# 3. Il Prompt: le istruzioni per l'IA
 prompt = """
 Scrivi un breve articolo da blog (circa 300 parole) su una curiosità tecnologica o informatica interessante. 
 Restituisci l'output ESATTAMENTE in questo formato HTML, senza aggiungere altro testo prima o dopo:
@@ -37,12 +34,16 @@ Restituisci l'output ESATTAMENTE in questo formato HTML, senza aggiungere altro 
 </html>
 """
 
-# 4. Chiamo l'IA e mi faccio generare il contenuto
-print("Generazione articolo in corso...")
-response = model.generate_content(prompt)
+print("Generazione articolo in corso con il nuovo SDK...")
+
+# 4. Chiamo l'IA con la nuova sintassi
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents=prompt,
+)
 html_content = response.text
 
-# Pulisco l'output nel caso Gemini aggiunga i tag markdown ```html
+# Pulisco l'output nel caso Gemini aggiunga i tag markdown
 if html_content.startswith("```html"):
     html_content = html_content[7:]
 if html_content.endswith("```"):
